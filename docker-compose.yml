@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=nikokirilenko
+      - POSTGRES_PASSWORD=pass1234
+      - POSTGRES_DB=counter
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  backend:
+    image: counter-backend:1
+    container_name: backend
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=nikokirilenko
+      - DB_PASSWORD=pass1234
+      - DB_NAME=counter
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+
+  frontend:
+    image: counter-frontend:1
+    container_name: frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  pgdata:
