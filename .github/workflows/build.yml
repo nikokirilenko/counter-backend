@@ -39,10 +39,8 @@ jobs:
         docker build -t nikokirilenko/counter-backend:${{ steps.version.outputs.version }} .
 
     - name: Docker login
-      env:
-        DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
       run: |
-        docker login -u nikokirilenko --password $DOCKER_HUB_PASSWORD
+        docker login -u nikokirilenko --password ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Docker push
       run: |
