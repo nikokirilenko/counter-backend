@@ -9,11 +9,16 @@ jobs:
       matrix:
         python-version: ["3.10"]
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}
+        fetch-depth: 0
 
-    - name: Git Semantic Version
-      uses: PaulHatch/semantic-version@v5.0.3
-  
+    - name: Git Version
+      id: version
+      uses: codacy/git-version@2.7.1
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -24,6 +29,22 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pylint
+  
     - name: Analysing the code with pylint
       run: |
         pylint --fail-under=9 $(git ls-files '*.py')
+
+    - name: Build Docker Image
+      run: |
+        docker build -t nikokirilenko/counter-backend:${{ steps.version.outputs.version }} .
+
+    - name: Docker login
+      env:
+        DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      run: |
+        echo $DOCKER_PASS | docker login -u nikokirilenko --password-stdin $DOCKER_HUB_PASSWORD
+
+    - name: Docker push
+      run: |
+        docker push nikokirilenko/counter-backend:${{ steps.version.outputs.version }}
+
