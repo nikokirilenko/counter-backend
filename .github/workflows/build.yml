@@ -42,7 +42,7 @@ jobs:
       env:
         DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
       run: |
-        echo $DOCKER_PASS | docker login -u nikokirilenko --password-stdin $DOCKER_HUB_PASSWORD
+        echo $DOCKER_PASS | docker login -u nikokirilenko --password $DOCKER_HUB_PASSWORD
 
     - name: Docker push
       run: |
